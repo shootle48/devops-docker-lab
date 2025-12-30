@@ -6,3 +6,16 @@ services:
     ports:
       - "80:80" # เจาะรู (Mapping Port)
     container_name: my-smart-container # ตั้งชื่อ Container
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "9443:9443"  # ใช้ Port นี้เข้าหน้าเว็บ (HTTPS)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # อนุญาตให้คุยกับ Docker ในเครื่องได้
+      - portainer_data:/data # สร้างถังเก็บข้อมูลถาวร (Password จะได้ไม่หาย)
+
+# สร้างถังเก็บข้อมูล (Volume)
+volumes:
+  portainer_data:
