@@ -1,0 +1,41 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main  # หุ่นยนต์จะทำงานเมื่อมีการ Push ไปที่ main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. หุ่นยนต์ดึงโค้ดเรามาถือไว้
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. ส่งไฟล์ทั้งหมด (scp) ไปที่ Server AWS
+      - name: Copy files to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "/home/ubuntu/app"
+
+      # 3. SSH เข้าไปสั่ง Build & Run Docker
+      - name: Build and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/app
+            # สร้าง Image ใหม่ (ตั้งชื่อว่า my-auto-app)
+            docker build -t my-auto-app .
+            # หยุดและลบตัวเก่า (ใส่ || true เพื่อไม่ให้ error ถ้าไม่มีตัวเก่า)
+            docker stop my-auto-container || true
+            docker rm my-auto-container || true
+            # รันตัวใหม่
+            docker run -d -p 80:80 --name my-auto-container my-auto-app
