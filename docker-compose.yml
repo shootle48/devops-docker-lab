@@ -6,6 +6,23 @@ services:
     ports:
       - "80:80" # เจาะรู (Mapping Port)
     container_name: my-smart-container # ตั้งชื่อ Container
+    depends_on:
+      - api
+  api:
+    build: ./backend
+    ports:
+      - "3002:3002"
+    container_name: my-backend
+    environment:
+      - DB_HOST=mongo
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:lastest
+    container_name: my-database
+    restart: always
+    volumes:
+      - mongo_data:/data/db
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
@@ -19,3 +36,4 @@ services:
 # สร้างถังเก็บข้อมูล (Volume)
 volumes:
   portainer_data:
+  mongo_data
