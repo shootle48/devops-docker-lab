@@ -1,0 +1,8 @@
+version: '3.8'  # เวอร์ชันมาตรฐาน
+
+services:
+  web:          # ตั้งชื่อบริการว่า 'web'
+    build: .    # ให้สร้าง Image จาก Dockerfile ที่อยู่ตรงนี้ (.)
+    ports:
+      - "80:80" # เจาะรู (Mapping Port)
+    container_name: my-smart-container # ตั้งชื่อ Container

@@ -32,10 +32,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/app
-            # สร้าง Image ใหม่ (ตั้งชื่อว่า my-auto-app)
-            docker build -t my-auto-app .
-            # หยุดและลบตัวเก่า (ใส่ || true เพื่อไม่ให้ error ถ้าไม่มีตัวเก่า)
-            docker stop my-auto-container || true
-            docker rm my-auto-container || true
-            # รันตัวใหม่
-            docker run -d -p 80:80 --name my-auto-container my-auto-app
+            docker compose down  # เอาตัวเก่าลง (เพื่อความชัวร์)
+            docker compose up -d --build # เอาตัวใหม่ขึ้น
